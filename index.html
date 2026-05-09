@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Théorème de Thalès — Ateliers interactifs (4ème)</title>
+<style>
+  :root {
+    --bg: #f4f7fb;
+    --card: #ffffff;
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --accent: #7c3aed;
+    --success: #16a34a;
+    --success-bg: #dcfce7;
+    --error: #dc2626;
+    --error-bg: #fee2e2;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --highlight: #fbbf24;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 0;
+    line-height: 1.5;
+  }
+  header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    color: white;
+    padding: 32px 20px 28px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  header h1 { margin: 0 0 8px; font-size: 28px; font-weight: 700; }
+  header p { margin: 0; opacity: 0.9; font-size: 15px; }
+  .container {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 24px 20px 60px;
+  }
+  .progress-bar {
+    background: var(--border);
+    border-radius: 10px;
+    height: 10px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .progress-fill {
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    height: 100%;
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+  .nav-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .nav-tab {
+    background: var(--card);
+    border: 2px solid var(--border);
+    color: var(--text);
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+  }
+  .nav-tab:hover { border-color: var(--primary); }
+  .nav-tab.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+  }
+  .nav-tab.completed {
+    background: var(--success-bg);
+    border-color: var(--success);
+    color: var(--success);
+  }
+  .nav-tab.completed.active {
+    background: var(--success);
+    color: white;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.04);
+    margin-bottom: 16px;
+  }
+  .card h2 {
+    margin: 0 0 6px;
+    color: var(--primary-dark);
+    font-size: 22px;
+  }
+  .card .subtitle {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+  .question {
+    font-size: 16px;
+    margin: 16px 0 12px;
+    font-weight: 500;
+  }
+  .figure-wrap {
+    display: flex;
+    justify-content: center;
+    margin: 16px 0;
+    background: #fafbfd;
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid var(--border);
+  }
+  svg { display: block; max-width: 100%; height: auto; }
+  .point-clickable {
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .point-clickable:hover { r: 9; }
+  .segment-clickable {
+    cursor: pointer;
+    transition: stroke 0.2s, stroke-width 0.2s;
+  }
+  .segment-clickable:hover { stroke: var(--highlight); stroke-width: 5; }
+  .segment-selected { stroke: var(--primary) !important; stroke-width: 5 !important; }
+  .segment-correct { stroke: var(--success) !important; stroke-width: 5 !important; }
+  .segment-error { stroke: var(--error) !important; stroke-width: 5 !important; }
+
+  .point-selected { fill: var(--primary) !important; }
+  .point-correct { fill: var(--success) !important; }
+  .point-error { fill: var(--error) !important; }
+
+  .options {
+    display: grid;
+    gap: 10px;
+    margin: 16px 0;
+  }
+  .option {
+    background: white;
+    border: 2px solid var(--border);
+    padding: 14px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: left;
+    font-size: 15px;
+    font-family: inherit;
+    color: var(--text);
+    transition: all 0.15s;
+  }
+  .option:hover:not(:disabled) { border-color: var(--primary); transform: translateX(2px); }
+  .option.correct { border-color: var(--success); background: var(--success-bg); }
+  .option.wrong { border-color: var(--error); background: var(--error-bg); }
+  .option:disabled { cursor: not-allowed; opacity: 0.7; }
+
+  .feedback {
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-top: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    display: none;
+  }
+  .feedback.success {
+    background: var(--success-bg);
+    color: var(--success);
+    border-left: 4px solid var(--success);
+    display: block;
+  }
+  .feedback.error {
+    background: var(--error-bg);
+    color: var(--error);
+    border-left: 4px solid var(--error);
+    display: block;
+  }
+  .feedback.info {
+    background: #dbeafe;
+    color: var(--primary-dark);
+    border-left: 4px solid var(--primary);
+    display: block;
+  }
+  .actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+  button.btn {
+    padding: 11px 22px;
+    border-radius: 10px;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+  }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-secondary {
+    background: white;
+    color: var(--text);
+    border: 2px solid var(--border);
+  }
+  .btn-secondary:hover { border-color: var(--primary); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .matching-area {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 8px 16px;
+    margin: 16px 0;
+    align-items: center;
+  }
+  .match-label {
+    background: #eff6ff;
+    border: 2px solid var(--primary);
+    color: var(--primary-dark);
+    padding: 10px 14px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+  }
+  .match-arrow { color: var(--muted); font-size: 18px; text-align: center; }
+  .match-slot {
+    background: white;
+    border: 2px dashed var(--border);
+    padding: 10px 14px;
+    border-radius: 8px;
+    min-height: 44px;
+    text-align: center;
+    color: var(--muted);
+    font-family: 'Courier New', monospace;
+  }
+  .match-slot.filled {
+    background: #f0f9ff;
+    border-style: solid;
+    border-color: var(--primary);
+    color: var(--primary-dark);
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .match-slot.correct { border-color: var(--success); background: var(--success-bg); color: var(--success); }
+  .match-slot.wrong { border-color: var(--error); background: var(--error-bg); color: var(--error); }
+
+  .chip-tray {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0;
+    padding: 14px;
+    background: #f9fafb;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    min-height: 60px;
+  }
+  .chip {
+    background: white;
+    border: 2px solid var(--primary);
+    color: var(--primary-dark);
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    transition: all 0.15s;
+  }
+  .chip:hover:not(.used) { background: var(--primary); color: white; transform: translateY(-2px); }
+  .chip.used { opacity: 0.3; cursor: not-allowed; }
+
+  .fraction {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 8px;
+    vertical-align: middle;
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    font-size: 18px;
+  }
+  .fraction .top {
+    border-bottom: 2px solid var(--text);
+    padding: 4px 12px;
+    min-width: 60px;
+    text-align: center;
+  }
+  .fraction .bot { padding: 4px 12px; min-width: 60px; text-align: center; }
+  .fraction .slot {
+    background: #fef3c7;
+    border-radius: 6px;
+    color: var(--accent);
+    cursor: pointer;
+    border: 2px dashed var(--accent);
+  }
+  .fraction .slot.filled {
+    background: #ede9fe;
+    border-style: solid;
+    color: var(--accent);
+  }
+  .fraction .slot.correct { background: var(--success-bg); border-color: var(--success); color: var(--success); }
+  .fraction .slot.wrong { background: var(--error-bg); border-color: var(--error); color: var(--error); }
+
+  .equation-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 20px 0;
+    font-size: 22px;
+    font-weight: 700;
+  }
+
+  .hint-box {
+    background: #fef9c3;
+    border-left: 4px solid var(--highlight);
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    margin: 12px 0;
+    display: none;
+  }
+  .hint-box.visible { display: block; }
+  .hint-box strong { color: #b45309; }
+
+  .legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: var(--muted);
+    margin: 8px 0;
+    justify-content: center;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .scenario {
+    background: #faf5ff;
+    border-left: 4px solid var(--accent);
+    padding: 14px 18px;
+    border-radius: 8px;
+    margin: 12px 0;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .scenario strong { color: var(--accent); }
+
+  .summary-card {
+    text-align: center;
+    padding: 40px 28px;
+  }
+  .summary-card .big-score {
+    font-size: 64px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 12px 0;
+  }
+  .step-indicator {
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .card { padding: 20px; }
+    header h1 { font-size: 22px; }
+    .matching-area { grid-template-columns: 1fr; }
+    .match-arrow { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📐 Théorème de Thalès</h1>
+  <p>Ateliers interactifs · Niveau 4<sup>ème</sup> · Concepts uniquement</p>
+</header>
+
+<div class="container">
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="nav-tabs" id="navTabs"></div>
+  <div id="exerciseContainer"></div>
+</div>
+
+<script>
+// ============================================================
+// État global
+// ============================================================
+const state = {
+  current: 0,
+  completed: new Array(7).fill(false),
+};
+
+const exercises = [
+  { id: 0, title: "Atelier 1 — Reconnaître le sommet", render: renderEx1 },
+  { id: 1, title: "Atelier 2 — Les droites parallèles", render: renderEx2 },
+  { id: 2, title: "Atelier 3 — Les deux triangles", render: renderEx3 },
+  { id: 3, title: "Atelier 4 — Côtés homologues", render: renderEx4 },
+  { id: 4, title: "Atelier 5 — L'égalité de Thalès", render: renderEx5 },
+  { id: 5, title: "Atelier 6 — Configuration papillon", render: renderEx6 },
+  { id: 6, title: "Atelier 7 — Problème complet", render: renderEx7 },
+];
+
+// ============================================================
+// SVG helpers
+// ============================================================
+function thalesTriangleSVG(opts = {}) {
+  // Triangle ABC, M on [AB], N on [AC], (MN) // (BC)
+  // A at top
+  const interactive = opts.interactive || {};
+  return `
+    <svg viewBox="0 0 420 320" width="420" height="320" id="${opts.id || 'svg1'}">
+      <!-- Triangle ABC -->
+      <polygon points="210,40 60,280 380,280"
+               fill="rgba(37, 99, 235, 0.05)"
+               stroke="#94a3b8" stroke-width="2"/>
+
+      <!-- Segments individuels (cliquables) -->
+      <line id="${opts.id}-AB" x1="210" y1="40" x2="60" y2="280"
+            stroke="#475569" stroke-width="3"
+            class="${interactive.segments ? 'segment-clickable' : ''}"
+            data-name="[AB]" />
+      <line id="${opts.id}-AC" x1="210" y1="40" x2="380" y2="280"
+            stroke="#475569" stroke-width="3"
+            class="${interactive.segments ? 'segment-clickable' : ''}"
+            data-name="[AC]" />
+      <line id="${opts.id}-BC" x1="60" y1="280" x2="380" y2="280"
+            stroke="#475569" stroke-width="3"
+            class="${interactive.segments ? 'segment-clickable' : ''}"
+            data-name="[BC]" />
+
+      <!-- M sur [AB], N sur [AC]   t = 0.45 -->
+      <!-- M = A + t*(B-A) = (210 - 67.5, 40 + 108) = (142.5, 148) -->
+      <!-- N = A + t*(C-A) = (210 + 76.5, 40 + 108) = (286.5, 148) -->
+      <line id="${opts.id}-MN" x1="142.5" y1="148" x2="286.5" y2="148"
+            stroke="#7c3aed" stroke-width="3"
+            class="${interactive.segments ? 'segment-clickable' : ''}"
+            data-name="[MN]" />
+
+      <!-- petits côtés AM et AN (déjà inclus dans AB/AC mais on dessine pour click) -->
+      <line id="${opts.id}-AM" x1="210" y1="40" x2="142.5" y2="148"
+            stroke="transparent" stroke-width="14"
+            class="${interactive.segments ? 'segment-clickable' : ''}"
+            data-name="[AM]" />
+      <line id="${opts.id}-AN" x1="210" y1="40" x2="286.5" y2="148"
+            stroke="transparent" stroke-width="14"
+            class="${interactive.segments ? 'segment-clickable' : ''}"
+            data-name="[AN]" />
+
+      <!-- Marques de parallélisme -->
+      <g stroke="#7c3aed" stroke-width="2" fill="none">
+        <path d="M 210,148 l -6,-4 l 0,8 z" fill="#7c3aed"/>
+        <path d="M 220,280 l -6,-4 l 0,8 z" fill="#7c3aed"/>
+      </g>
+
+      <!-- Points -->
+      <circle id="${opts.id}-A" cx="210" cy="40" r="7" fill="#1e40af"
+              class="${interactive.points ? 'point-clickable' : ''}" data-name="A"/>
+      <circle id="${opts.id}-B" cx="60" cy="280" r="7" fill="#1e40af"
+              class="${interactive.points ? 'point-clickable' : ''}" data-name="B"/>
+      <circle id="${opts.id}-C" cx="380" cy="280" r="7" fill="#1e40af"
+              class="${interactive.points ? 'point-clickable' : ''}" data-name="C"/>
+      <circle id="${opts.id}-M" cx="142.5" cy="148" r="7" fill="#7c3aed"
+              class="${interactive.points ? 'point-clickable' : ''}" data-name="M"/>
+      <circle id="${opts.id}-N" cx="286.5" cy="148" r="7" fill="#7c3aed"
+              class="${interactive.points ? 'point-clickable' : ''}" data-name="N"/>
+
+      <!-- Étiquettes -->
+      <text x="210" y="28" text-anchor="middle" font-size="18" font-weight="700" fill="#1e40af">A</text>
+      <text x="44" y="290" text-anchor="middle" font-size="18" font-weight="700" fill="#1e40af">B</text>
+      <text x="396" y="290" text-anchor="middle" font-size="18" font-weight="700" fill="#1e40af">C</text>
+      <text x="128" y="142" text-anchor="middle" font-size="18" font-weight="700" fill="#7c3aed">M</text>
+      <text x="302" y="142" text-anchor="middle" font-size="18" font-weight="700" fill="#7c3aed">N</text>
+    </svg>
+  `;
+}
+
+function butterflySVG(opts = {}) {
+  // Configuration papillon : O au centre, A et B d'un côté, A' et B' de l'autre
+  // (AB) // (A'B')
+  const interactive = opts.interactive || {};
+  return `
+    <svg viewBox="0 0 460 300" width="460" height="300" id="${opts.id || 'svgB'}">
+      <!-- triangle OAB en haut -->
+      <polygon points="230,150 90,40 360,40"
+               fill="rgba(37, 99, 235, 0.05)"
+               stroke="none"/>
+      <!-- triangle OA'B' en bas -->
+      <polygon points="230,150 130,260 320,260"
+               fill="rgba(124, 58, 237, 0.05)"
+               stroke="none"/>
+
+      <!-- Segments -->
+      <line id="${opts.id}-AB" x1="90" y1="40" x2="360" y2="40"
+            stroke="#475569" stroke-width="3"
+            class="${interactive.segments ? 'segment-clickable' : ''}" data-name="[AB]"/>
+      <line id="${opts.id}-ApBp" x1="130" y1="260" x2="320" y2="260"
+            stroke="#7c3aed" stroke-width="3"
+            class="${interactive.segments ? 'segment-clickable' : ''}" data-name="[A'B']"/>
+      <!-- droites passant par O -->
+      <line id="${opts.id}-AAp" x1="90" y1="40" x2="320" y2="260"
+            stroke="#475569" stroke-width="2.5"
+            class="${interactive.segments ? 'segment-clickable' : ''}" data-name="[AA']"/>
+      <line id="${opts.id}-BBp" x1="360" y1="40" x2="130" y2="260"
+            stroke="#475569" stroke-width="2.5"
+            class="${interactive.segments ? 'segment-clickable' : ''}" data-name="[BB']"/>
+
+      <!-- Marques de parallélisme -->
+      <g stroke="#7c3aed" stroke-width="2" fill="#7c3aed">
+        <path d="M 225,40 l -6,-4 l 0,8 z"/>
+        <path d="M 235,260 l -6,-4 l 0,8 z"/>
+      </g>
+
+      <!-- Points -->
+      <circle id="${opts.id}-A" cx="90" cy="40" r="7" fill="#1e40af"
+              class="${interactive.points ? 'point-clickable' : ''}" data-name="A"/>
+      <circle id="${opts.id}-B" cx="360" cy="40" r="7" fill="#1e40af"
+              class="${interactive.points ? 'point-clickable' : ''}" data-name="B"/>
+      <circle id="${opts.id}-O" cx="230" cy="150" r="8" fill="#dc2626"
+              class="${interactive.points ? 'point-clickable' : ''}" data-name="O"/>
+      <circle id="${opts.id}-Ap" cx="320" cy="260" r="7" fill="#7c3aed"
+              class="${interactive.points ? 'point-clickable' : ''}" data-name="A'"/>
+      <circle id="${opts.id}-Bp" cx="130" cy="260" r="7" fill="#7c3aed"
+              class="${interactive.points ? 'point-clickable' : ''}" data-name="B'"/>
+
+      <!-- Étiquettes -->
+      <text x="78" y="34" font-size="18" font-weight="700" fill="#1e40af">A</text>
+      <text x="368" y="34" font-size="18" font-weight="700" fill="#1e40af">B</text>
+      <text x="244" y="158" font-size="18" font-weight="700" fill="#dc2626">O</text>
+      <text x="328" y="278" font-size="18" font-weight="700" fill="#7c3aed">A'</text>
+      <text x="112" y="278" font-size="18" font-weight="700" fill="#7c3aed">B'</text>
+    </svg>
+  `;
+}
+
+// ============================================================
+// Layout helpers
+// ============================================================
+function renderNav() {
+  const nav = document.getElementById('navTabs');
+  nav.innerHTML = exercises.map((e, i) => {
+    const cls = ['nav-tab'];
+    if (i === state.current) cls.push('active');
+    if (state.completed[i]) cls.push('completed');
+    return `<button class="${cls.join(' ')}" data-idx="${i}">
+      ${state.completed[i] ? '✓ ' : ''}${i + 1}
+    </button>`;
+  }).join('');
+  nav.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.current = parseInt(btn.dataset.idx);
+      render();
+    });
+  });
+  // progress
+  const done = state.completed.filter(Boolean).length;
+  document.getElementById('progressFill').style.width = (done / exercises.length * 100) + '%';
+}
+
+function renderShell(title, subtitle, content) {
+  return `
+    <div class="card">
+      <div class="step-indicator">Étape ${state.current + 1} sur ${exercises.length}</div>
+      <h2>${title}</h2>
+      <div class="subtitle">${subtitle}</div>
+      ${content}
+    </div>
+  `;
+}
+
+function nextButton(label = "Atelier suivant →") {
+  return `<button class="btn btn-primary" id="nextBtn">${label}</button>`;
+}
+
+function showFeedback(elId, type, msg) {
+  const el = document.getElementById(elId);
+  el.className = 'feedback ' + type;
+  el.innerHTML = msg;
+}
+
+function markCompletedAndAdvance() {
+  state.completed[state.current] = true;
+  if (state.current < exercises.length - 1) {
+    state.current++;
+  }
+  render();
+}
+
+function attachNextHandler() {
+  const btn = document.getElementById('nextBtn');
+  if (btn) btn.addEventListener('click', markCompletedAndAdvance);
+}
+
+function render() {
+  renderNav();
+  document.getElementById('exerciseContainer').innerHTML =
+    exercises[state.current].render();
+  exercises[state.current].render.afterRender?.();
+  // Each exercise's render returns HTML and may register listeners via post-call
+  if (exercises[state.current].afterRender) exercises[state.current].afterRender();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ============================================================
+// Atelier 1 — Reconnaître le sommet (le point commun aux deux triangles)
+// ============================================================
+function renderEx1() {
+  const html = renderShell(
+    "Reconnaître le sommet commun",
+    "On observe une figure formée d'un grand triangle et d'un petit triangle. On va d'abord identifier le point qu'ils ont en commun.",
+    `
+      <div class="question">👉 Cliquez sur le <strong>sommet commun</strong> aux deux triangles ABC et AMN.</div>
+      <div class="figure-wrap">${thalesTriangleSVG({ id: 'svg1', interactive: { points: true } })}</div>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-dot" style="background:#1e40af"></span>Sommets du grand triangle</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#7c3aed"></span>Sommets du petit triangle</div>
+      </div>
+      <div id="ex1-feedback" class="feedback"></div>
+      <div class="hint-box" id="ex1-hint">
+        <strong>💡 Indice :</strong> le sommet commun est le point où les deux côtés non parallèles se rejoignent — c'est la "pointe" qui est partagée par les deux triangles.
+      </div>
+      <div class="actions">
+        <button class="btn btn-secondary" id="hintBtn">💡 Indice</button>
+        <button class="btn btn-primary" id="nextBtn" disabled>Atelier suivant →</button>
+      </div>
+    `
+  );
+  return html;
+}
+renderEx1.afterRender = () => {
+  const points = document.querySelectorAll('#svg1 .point-clickable');
+  let solved = false;
+  points.forEach(p => {
+    p.addEventListener('click', () => {
+      if (solved) return;
+      const name = p.dataset.name;
+      points.forEach(x => x.classList.remove('point-selected', 'point-correct', 'point-error'));
+      if (name === 'A') {
+        p.classList.add('point-correct');
+        showFeedback('ex1-feedback', 'success',
+          '✅ Bravo ! <strong>A</strong> est le sommet commun aux deux triangles ABC et AMN. C\'est <em>toujours</em> ce sommet qui apparaît dans les deux dénominateurs et numérateurs de l\'égalité de Thalès.');
+        document.getElementById('nextBtn').disabled = false;
+        solved = true;
+      } else {
+        p.classList.add('point-error');
+        showFeedback('ex1-feedback', 'error',
+          `❌ Non, <strong>${name}</strong> n'appartient qu'à un seul des deux triangles. Cherche le point qui appartient aux <em>deux</em> triangles.`);
+      }
+    });
+  });
+  document.getElementById('hintBtn').addEventListener('click', () => {
+    document.getElementById('ex1-hint').classList.add('visible');
+  });
+  attachNextHandler();
+};
+
+// ============================================================
+// Atelier 2 — Identifier les droites parallèles
+// ============================================================
+function renderEx2() {
+  return renderShell(
+    "Identifier les droites parallèles",
+    "Le théorème de Thalès s'applique uniquement quand on a deux droites parallèles. Trouvons-les !",
+    `
+      <div class="question">👉 Cliquez sur les <strong>deux segments parallèles</strong> de la figure (deux clics).</div>
+      <div class="figure-wrap">${thalesTriangleSVG({ id: 'svg2', interactive: { segments: true } })}</div>
+      <div id="ex2-feedback" class="feedback"></div>
+      <div class="hint-box" id="ex2-hint">
+        <strong>💡 Indice :</strong> les marques violettes (▶) sur la figure indiquent toujours les segments parallèles. Cherche les deux segments qui portent ces marques.
+      </div>
+      <div class="actions">
+        <button class="btn btn-secondary" id="hintBtn">💡 Indice</button>
+        <button class="btn btn-secondary" id="resetBtn">↻ Recommencer</button>
+        <button class="btn btn-primary" id="nextBtn" disabled>Atelier suivant →</button>
+      </div>
+    `
+  );
+}
+renderEx2.afterRender = () => {
+  const target = ['[MN]', '[BC]'];
+  let selected = [];
+  const segs = document.querySelectorAll('#svg2 .segment-clickable');
+  function reset() {
+    selected = [];
+    segs.forEach(s => s.classList.remove('segment-selected', 'segment-correct', 'segment-error'));
+    document.getElementById('ex2-feedback').className = 'feedback';
+    document.getElementById('nextBtn').disabled = true;
+  }
+  segs.forEach(s => {
+    s.addEventListener('click', () => {
+      const name = s.dataset.name;
+      if (selected.includes(name)) return;
+      selected.push(name);
+      s.classList.add('segment-selected');
+      if (selected.length === 2) {
+        const ok = selected.every(n => target.includes(n));
+        if (ok) {
+          segs.forEach(x => {
+            if (target.includes(x.dataset.name)) {
+              x.classList.remove('segment-selected');
+              x.classList.add('segment-correct');
+            }
+          });
+          showFeedback('ex2-feedback', 'success',
+            "✅ Excellent ! <strong>(MN) // (BC)</strong>. Sans cette condition, le théorème de Thalès ne fonctionnerait pas. Les marques en flèche indiquent toujours les droites parallèles.");
+          document.getElementById('nextBtn').disabled = false;
+        } else {
+          segs.forEach(x => {
+            if (selected.includes(x.dataset.name) && !target.includes(x.dataset.name)) {
+              x.classList.remove('segment-selected');
+              x.classList.add('segment-error');
+            }
+          });
+          showFeedback('ex2-feedback', 'error',
+            `❌ <strong>${selected.join(' et ')}</strong> ne sont pas parallèles. Regarde bien les marques (▶) sur la figure et clique sur "Recommencer".`);
+        }
+      }
+    });
+  });
+  document.getElementById('resetBtn').addEventListener('click', reset);
+  document.getElementById('hintBtn').addEventListener('click', () => {
+    document.getElementById('ex2-hint').classList.add('visible');
+  });
+  attachNextHandler();
+};
+
+// ============================================================
+// Atelier 3 — Identifier les deux triangles
+// ============================================================
+function renderEx3() {
+  const options = [
+    { txt: "Le triangle <strong>AMN</strong> et le triangle <strong>ABC</strong>", correct: true },
+    { txt: "Le triangle <strong>AMB</strong> et le triangle <strong>ANC</strong>", correct: false },
+    { txt: "Le triangle <strong>MNB</strong> et le triangle <strong>MNC</strong>", correct: false },
+    { txt: "Le triangle <strong>ABM</strong> et le triangle <strong>BCN</strong>", correct: false },
+  ];
+  return renderShell(
+    "Quels sont les deux triangles ?",
+    "Le théorème de Thalès met en relation deux triangles : un petit (à l'intérieur) et un grand. Sauras-tu les nommer correctement ?",
+    `
+      <div class="figure-wrap">${thalesTriangleSVG({ id: 'svg3' })}</div>
+      <div class="question">👉 Quels sont les deux triangles concernés par le théorème ?</div>
+      <div class="options">
+        ${options.map((o, i) => `<button class="option" data-correct="${o.correct}">${o.txt}</button>`).join('')}
+      </div>
+      <div id="ex3-feedback" class="feedback"></div>
+      <div class="actions">
+        <button class="btn btn-primary" id="nextBtn" disabled>Atelier suivant →</button>
+      </div>
+    `
+  );
+}
+renderEx3.afterRender = () => {
+  document.querySelectorAll('.option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      document.querySelectorAll('.option').forEach(o => o.disabled = true);
+      if (opt.dataset.correct === 'true') {
+        opt.classList.add('correct');
+        showFeedback('ex3-feedback', 'success',
+          "✅ Parfait ! Le petit triangle <strong>AMN</strong> est <em>à l'intérieur</em> du grand triangle <strong>ABC</strong>. Ils partagent le sommet A. Remarque : on commence toujours par <strong>A</strong> dans les deux noms.");
+        document.getElementById('nextBtn').disabled = false;
+      } else {
+        opt.classList.add('wrong');
+        document.querySelectorAll('.option').forEach(o => {
+          if (o.dataset.correct === 'true') o.classList.add('correct');
+        });
+        showFeedback('ex3-feedback', 'error',
+          "❌ Pas tout à fait. Les deux triangles doivent partager un sommet (le sommet A) et leurs deux autres côtés doivent être parallèles. La bonne réponse est en vert.");
+        document.getElementById('nextBtn').disabled = false;
+      }
+    });
+  });
+  attachNextHandler();
+};
+
+// ============================================================
+// Atelier 4 — Côtés homologues (matching)
+// ============================================================
+function renderEx4() {
+  return renderShell(
+    "Les côtés homologues",
+    "Deux côtés sont dits <em>homologues</em> quand ils se correspondent dans les deux triangles. Associe chaque côté du petit triangle au bon côté du grand triangle.",
+    `
+      <div class="figure-wrap">${thalesTriangleSVG({ id: 'svg4' })}</div>
+      <div class="question">👉 Pour chaque côté du petit triangle <strong>AMN</strong>, choisis son côté homologue dans <strong>ABC</strong>.</div>
+
+      <div class="matching-area" id="matchArea">
+        <div class="match-label">[AM]</div>
+        <div class="match-arrow">↔</div>
+        <div class="match-slot" data-key="AM" data-target="[AB]">— choisir —</div>
+
+        <div class="match-label">[AN]</div>
+        <div class="match-arrow">↔</div>
+        <div class="match-slot" data-key="AN" data-target="[AC]">— choisir —</div>
+
+        <div class="match-label">[MN]</div>
+        <div class="match-arrow">↔</div>
+        <div class="match-slot" data-key="MN" data-target="[BC]">— choisir —</div>
+      </div>
+
+      <div class="step-indicator" style="margin-top:14px">Côtés disponibles (clique pour placer)</div>
+      <div class="chip-tray" id="chipTray">
+        <button class="chip" data-val="[AB]">[AB]</button>
+        <button class="chip" data-val="[AC]">[AC]</button>
+        <button class="chip" data-val="[BC]">[BC]</button>
+        <button class="chip" data-val="[AM]">[AM]</button>
+        <button class="chip" data-val="[MN]">[MN]</button>
+      </div>
+
+      <div id="ex4-feedback" class="feedback"></div>
+      <div class="hint-box" id="ex4-hint">
+        <strong>💡 Astuce :</strong> deux côtés homologues sont <em>portés par la même droite</em> ou <em>parallèles</em>. [AM] et [AB] sont sur la même droite, donc ils sont homologues !
+      </div>
+      <div class="actions">
+        <button class="btn btn-secondary" id="hintBtn">💡 Indice</button>
+        <button class="btn btn-secondary" id="resetBtn">↻ Recommencer</button>
+        <button class="btn btn-primary" id="checkBtn">Vérifier</button>
+        <button class="btn btn-primary" id="nextBtn" disabled style="display:none">Atelier suivant →</button>
+      </div>
+    `
+  );
+}
+renderEx4.afterRender = () => {
+  let active = null;
+  const chips = document.querySelectorAll('#chipTray .chip');
+  const slots = document.querySelectorAll('.match-slot');
+
+  chips.forEach(ch => {
+    ch.addEventListener('click', () => {
+      if (ch.classList.contains('used')) return;
+      // Toggle active chip
+      chips.forEach(c => c.style.outline = '');
+      if (active === ch) {
+        active = null;
+      } else {
+        active = ch;
+        ch.style.outline = '3px solid #fbbf24';
+      }
+    });
+  });
+
+  slots.forEach(slot => {
+    slot.addEventListener('click', () => {
+      // If slot already filled, clicking returns chip to tray
+      if (slot.classList.contains('filled') && !active) {
+        const val = slot.textContent;
+        const chip = [...chips].find(c => c.dataset.val === val);
+        if (chip) chip.classList.remove('used');
+        slot.classList.remove('filled', 'correct', 'wrong');
+        slot.textContent = '— choisir —';
+        return;
+      }
+      if (!active) return;
+      // remove previous
+      if (slot.classList.contains('filled')) {
+        const prev = slot.textContent;
+        const chip = [...chips].find(c => c.dataset.val === prev);
+        if (chip) chip.classList.remove('used');
+      }
+      slot.textContent = active.dataset.val;
+      slot.classList.add('filled');
+      slot.classList.remove('correct', 'wrong');
+      active.classList.add('used');
+      active.style.outline = '';
+      active = null;
+    });
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    chips.forEach(c => { c.classList.remove('used'); c.style.outline = ''; });
+    slots.forEach(s => {
+      s.textContent = '— choisir —';
+      s.classList.remove('filled', 'correct', 'wrong');
+    });
+    document.getElementById('ex4-feedback').className = 'feedback';
+    active = null;
+  });
+
+  document.getElementById('checkBtn').addEventListener('click', () => {
+    let allCorrect = true;
+    let anyFilled = false;
+    slots.forEach(s => {
+      if (s.classList.contains('filled')) {
+        anyFilled = true;
+        if (s.textContent === s.dataset.target) {
+          s.classList.remove('wrong');
+          s.classList.add('correct');
+        } else {
+          s.classList.remove('correct');
+          s.classList.add('wrong');
+          allCorrect = false;
+        }
+      } else {
+        allCorrect = false;
+      }
+    });
+    if (!anyFilled) {
+      showFeedback('ex4-feedback', 'info', "Place d'abord les côtés dans les emplacements.");
+      return;
+    }
+    if (allCorrect) {
+      showFeedback('ex4-feedback', 'success',
+        "✅ Bravo ! Tu as bien identifié les <strong>3 paires de côtés homologues</strong> : [AM]↔[AB], [AN]↔[AC], [MN]↔[BC]. Ces paires forment les fractions de l'égalité de Thalès.");
+      document.getElementById('checkBtn').style.display = 'none';
+      document.getElementById('nextBtn').style.display = '';
+      document.getElementById('nextBtn').disabled = false;
+    } else {
+      showFeedback('ex4-feedback', 'error',
+        "❌ Quelques associations sont incorrectes (en rouge). Souviens-toi : un côté homologue est porté par <em>la même droite</em> ou est <em>parallèle</em> au côté de départ.");
+    }
+  });
+
+  document.getElementById('hintBtn').addEventListener('click', () => {
+    document.getElementById('ex4-hint').classList.add('visible');
+  });
+  attachNextHandler();
+};
+
+// ============================================================
+// Atelier 5 — Construire l'égalité de Thalès
+// ============================================================
+function renderEx5() {
+  return renderShell(
+    "Écrire l'égalité de Thalès",
+    "Maintenant que tu connais les côtés homologues, construis la fameuse égalité de Thalès en plaçant les bons côtés dans les fractions.",
+    `
+      <div class="figure-wrap">${thalesTriangleSVG({ id: 'svg5' })}</div>
+      <div class="question">👉 Complète l'égalité en glissant les bons côtés dans les emplacements jaunes :</div>
+
+      <div class="equation-row">
+        <span class="fraction">
+          <span class="top">[AM]</span>
+          <span class="bot slot" data-target="[AB]">?</span>
+        </span>
+        <span>=</span>
+        <span class="fraction">
+          <span class="top slot" data-target="[AN]">?</span>
+          <span class="bot">[AC]</span>
+        </span>
+        <span>=</span>
+        <span class="fraction">
+          <span class="top slot" data-target="[MN]">?</span>
+          <span class="bot slot" data-target="[BC]">?</span>
+        </span>
+      </div>
+
+      <div class="step-indicator">Côtés disponibles</div>
+      <div class="chip-tray" id="chipTray5">
+        <button class="chip" data-val="[AB]">[AB]</button>
+        <button class="chip" data-val="[AC]">[AC]</button>
+        <button class="chip" data-val="[BC]">[BC]</button>
+        <button class="chip" data-val="[AN]">[AN]</button>
+        <button class="chip" data-val="[MN]">[MN]</button>
+        <button class="chip" data-val="[AM]">[AM]</button>
+      </div>
+
+      <div id="ex5-feedback" class="feedback"></div>
+      <div class="hint-box" id="ex5-hint">
+        <strong>💡 Règle d'or :</strong>
+        Dans chaque fraction, on met le <strong>côté du petit triangle</strong> au numérateur et le <strong>côté du grand triangle</strong> au dénominateur. Les deux côtés d'une même fraction doivent être <em>homologues</em> !
+      </div>
+      <div class="actions">
+        <button class="btn btn-secondary" id="hintBtn">💡 Indice</button>
+        <button class="btn btn-secondary" id="resetBtn">↻ Recommencer</button>
+        <button class="btn btn-primary" id="checkBtn">Vérifier</button>
+        <button class="btn btn-primary" id="nextBtn" disabled style="display:none">Atelier suivant →</button>
+      </div>
+    `
+  );
+}
+renderEx5.afterRender = () => {
+  let active = null;
+  const chips = document.querySelectorAll('#chipTray5 .chip');
+  const slots = document.querySelectorAll('.fraction .slot');
+
+  chips.forEach(ch => {
+    ch.addEventListener('click', () => {
+      if (ch.classList.contains('used')) return;
+      chips.forEach(c => c.style.outline = '');
+      if (active === ch) {
+        active = null;
+      } else {
+        active = ch;
+        ch.style.outline = '3px solid #fbbf24';
+      }
+    });
+  });
+
+  slots.forEach(slot => {
+    slot.addEventListener('click', () => {
+      if (slot.classList.contains('filled') && !active) {
+        const val = slot.textContent;
+        const chip = [...chips].find(c => c.dataset.val === val);
+        if (chip) chip.classList.remove('used');
+        slot.classList.remove('filled', 'correct', 'wrong');
+        slot.textContent = '?';
+        return;
+      }
+      if (!active) return;
+      if (slot.classList.contains('filled')) {
+        const prev = slot.textContent;
+        const chip = [...chips].find(c => c.dataset.val === prev);
+        if (chip) chip.classList.remove('used');
+      }
+      slot.textContent = active.dataset.val;
+      slot.classList.add('filled');
+      slot.classList.remove('correct', 'wrong');
+      active.classList.add('used');
+      active.style.outline = '';
+      active = null;
+    });
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    chips.forEach(c => { c.classList.remove('used'); c.style.outline = ''; });
+    slots.forEach(s => {
+      s.textContent = '?';
+      s.classList.remove('filled', 'correct', 'wrong');
+    });
+    document.getElementById('ex5-feedback').className = 'feedback';
+    active = null;
+  });
+
+  document.getElementById('checkBtn').addEventListener('click', () => {
+    let allCorrect = true;
+    let anyFilled = false;
+    slots.forEach(s => {
+      if (s.classList.contains('filled')) {
+        anyFilled = true;
+        if (s.textContent === s.dataset.target) {
+          s.classList.remove('wrong');
+          s.classList.add('correct');
+        } else {
+          s.classList.remove('correct');
+          s.classList.add('wrong');
+          allCorrect = false;
+        }
+      } else {
+        allCorrect = false;
+      }
+    });
+    if (!anyFilled) {
+      showFeedback('ex5-feedback', 'info', "Place d'abord les côtés dans les fractions.");
+      return;
+    }
+    if (allCorrect) {
+      showFeedback('ex5-feedback', 'success',
+        "✅ Magnifique ! Tu viens d'écrire l'égalité de Thalès :<br>" +
+        "<strong>AM/AB = AN/AC = MN/BC</strong><br>" +
+        "Le petit triangle est toujours <em>au-dessus</em>, le grand triangle <em>en dessous</em>.");
+      document.getElementById('checkBtn').style.display = 'none';
+      document.getElementById('nextBtn').style.display = '';
+      document.getElementById('nextBtn').disabled = false;
+    } else {
+      showFeedback('ex5-feedback', 'error',
+        "❌ Il y a des erreurs. Vérifie : dans chaque fraction, le numérateur doit appartenir au petit triangle (AMN) et le dénominateur au grand (ABC), avec deux côtés <em>homologues</em>.");
+    }
+  });
+
+  document.getElementById('hintBtn').addEventListener('click', () => {
+    document.getElementById('ex5-hint').classList.add('visible');
+  });
+  attachNextHandler();
+};
+
+// ============================================================
+// Atelier 6 — Configuration papillon
+// ============================================================
+function renderEx6() {
+  return renderShell(
+    "La configuration « papillon »",
+    "Le théorème de Thalès s'applique aussi quand les deux triangles sont placés <em>tête-bêche</em>, séparés par le sommet commun. On appelle cela la configuration « papillon » 🦋.",
+    `
+      <div class="figure-wrap">${butterflySVG({ id: 'svgB', interactive: { points: true } })}</div>
+
+      <div class="question">👉 <strong>Question 1.</strong> Cliquez sur le sommet commun aux deux triangles.</div>
+      <div id="ex6-feedback1" class="feedback"></div>
+
+      <div id="ex6-step2" style="display:none; margin-top:24px;">
+        <div class="question">👉 <strong>Question 2.</strong> Quelle est la condition pour appliquer Thalès ici ?</div>
+        <div class="options" id="ex6-opts">
+          <button class="option" data-correct="false">Les segments [AB] et [A'B'] sont perpendiculaires.</button>
+          <button class="option" data-correct="true">Les segments [AB] et [A'B'] sont parallèles.</button>
+          <button class="option" data-correct="false">Les triangles OAB et OA'B' ont la même aire.</button>
+          <button class="option" data-correct="false">Le point O est le milieu de [AA'].</button>
+        </div>
+        <div id="ex6-feedback2" class="feedback"></div>
+      </div>
+
+      <div id="ex6-step3" style="display:none; margin-top:24px;">
+        <div class="question">👉 <strong>Question 3.</strong> Quel côté est homologue à <strong>[OA]</strong> ?</div>
+        <div class="options" id="ex6-opts3">
+          <button class="option" data-correct="false">[OB]</button>
+          <button class="option" data-correct="false">[OB']</button>
+          <button class="option" data-correct="true">[OA']</button>
+          <button class="option" data-correct="false">[A'B']</button>
+        </div>
+        <div id="ex6-feedback3" class="feedback"></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="nextBtn" disabled>Atelier suivant →</button>
+      </div>
+    `
+  );
+}
+renderEx6.afterRender = () => {
+  // Question 1: click apex O
+  const points = document.querySelectorAll('#svgB .point-clickable');
+  let q1 = false, q2 = false, q3 = false;
+  function maybeFinish() {
+    if (q1 && q2 && q3) document.getElementById('nextBtn').disabled = false;
+  }
+  points.forEach(p => {
+    p.addEventListener('click', () => {
+      if (q1) return;
+      const name = p.dataset.name;
+      points.forEach(x => x.classList.remove('point-correct', 'point-error'));
+      if (name === 'O') {
+        p.classList.add('point-correct');
+        showFeedback('ex6-feedback1', 'success',
+          "✅ Oui ! <strong>O</strong> est le sommet commun, situé <em>entre</em> les deux triangles. C'est aussi le point d'intersection des deux droites (AA') et (BB').");
+        document.getElementById('ex6-step2').style.display = '';
+        q1 = true;
+        maybeFinish();
+      } else {
+        p.classList.add('point-error');
+        showFeedback('ex6-feedback1', 'error',
+          `❌ <strong>${name}</strong> n'appartient qu'à un seul triangle. Cherche le point qui appartient aux deux.`);
+      }
+    });
+  });
+  // Question 2
+  document.querySelectorAll('#ex6-opts .option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      if (q2) return;
+      document.querySelectorAll('#ex6-opts .option').forEach(o => o.disabled = true);
+      if (opt.dataset.correct === 'true') {
+        opt.classList.add('correct');
+        showFeedback('ex6-feedback2', 'success',
+          "✅ Exactement ! On a besoin que <strong>(AB) // (A'B')</strong> pour appliquer Thalès. C'est la même condition que pour la configuration triangle classique.");
+      } else {
+        opt.classList.add('wrong');
+        document.querySelectorAll('#ex6-opts .option').forEach(o => {
+          if (o.dataset.correct === 'true') o.classList.add('correct');
+        });
+        showFeedback('ex6-feedback2', 'error',
+          "❌ Non. La <em>seule</em> condition nécessaire est que les deux segments soient parallèles.");
+      }
+      document.getElementById('ex6-step3').style.display = '';
+      q2 = true;
+      maybeFinish();
+    });
+  });
+  // Question 3
+  document.querySelectorAll('#ex6-opts3 .option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      if (q3) return;
+      document.querySelectorAll('#ex6-opts3 .option').forEach(o => o.disabled = true);
+      if (opt.dataset.correct === 'true') {
+        opt.classList.add('correct');
+        showFeedback('ex6-feedback3', 'success',
+          "✅ Bravo ! <strong>[OA]</strong> et <strong>[OA']</strong> sont portés par la même droite (AA') qui passe par O. Ils sont donc homologues. De même : [OB]↔[OB'] et [AB]↔[A'B'].<br>" +
+          "👉 L'égalité de Thalès devient : <strong>OA/OA' = OB/OB' = AB/A'B'</strong>");
+      } else {
+        opt.classList.add('wrong');
+        document.querySelectorAll('#ex6-opts3 .option').forEach(o => {
+          if (o.dataset.correct === 'true') o.classList.add('correct');
+        });
+        showFeedback('ex6-feedback3', 'error',
+          "❌ Non. Le côté homologue à [OA] est porté par la même droite que [OA] et passe par O — c'est [OA'].");
+      }
+      q3 = true;
+      maybeFinish();
+    });
+  });
+  attachNextHandler();
+};
+
+// ============================================================
+// Atelier 7 — Problème complet
+// ============================================================
+function renderEx7() {
+  return renderShell(
+    "Problème complet",
+    "Mets tout ensemble : reconnais la configuration, identifie les triangles, écris la bonne égalité.",
+    `
+      <div class="scenario">
+        🏗️ <strong>Énoncé.</strong> Sur un chantier, on observe la figure ci-dessous : deux poteaux de soutien forment un triangle ABC, et une traverse [MN] est posée parallèlement au sol [BC]. Le point M est sur [AB] et N sur [AC].
+      </div>
+
+      <div class="figure-wrap">${thalesTriangleSVG({ id: 'svg7' })}</div>
+
+      <div class="question">🔹 <strong>Question 1.</strong> Quelle est la configuration ?</div>
+      <div class="options" id="q7-1">
+        <button class="option" data-correct="true">Configuration triangle (un petit triangle dans un grand)</button>
+        <button class="option" data-correct="false">Configuration papillon (deux triangles tête-bêche)</button>
+        <button class="option" data-correct="false">Aucune des deux : Thalès ne s'applique pas</button>
+      </div>
+      <div id="fb7-1" class="feedback"></div>
+
+      <div id="q7-2-wrap" style="display:none">
+        <div class="question" style="margin-top:20px">🔹 <strong>Question 2.</strong> Quel est le sommet commun ?</div>
+        <div class="options" id="q7-2">
+          <button class="option" data-correct="false">B</button>
+          <button class="option" data-correct="true">A</button>
+          <button class="option" data-correct="false">M</button>
+          <button class="option" data-correct="false">N</button>
+        </div>
+        <div id="fb7-2" class="feedback"></div>
+      </div>
+
+      <div id="q7-3-wrap" style="display:none">
+        <div class="question" style="margin-top:20px">🔹 <strong>Question 3.</strong> Quel côté du petit triangle est homologue à [BC] ?</div>
+        <div class="options" id="q7-3">
+          <button class="option" data-correct="false">[AM]</button>
+          <button class="option" data-correct="false">[AN]</button>
+          <button class="option" data-correct="true">[MN]</button>
+          <button class="option" data-correct="false">[AB]</button>
+        </div>
+        <div id="fb7-3" class="feedback"></div>
+      </div>
+
+      <div id="q7-4-wrap" style="display:none">
+        <div class="question" style="margin-top:20px">🔹 <strong>Question 4.</strong> Parmi ces écritures, laquelle est correcte ?</div>
+        <div class="options" id="q7-4">
+          <button class="option" data-correct="false">AB / AM = AN / AC = BC / MN</button>
+          <button class="option" data-correct="true">AM / AB = AN / AC = MN / BC</button>
+          <button class="option" data-correct="false">AM / AC = AN / AB = MN / BC</button>
+          <button class="option" data-correct="false">AB / AC = AM / AN = BC / MN</button>
+        </div>
+        <div id="fb7-4" class="feedback"></div>
+      </div>
+
+      <div id="q7-final" style="display:none; margin-top:20px">
+        <div class="card" style="background:linear-gradient(135deg, #dcfce7 0%, #ede9fe 100%); border:none">
+          <h2 style="color:var(--success); margin-bottom:8px">🎉 Atelier terminé !</h2>
+          <p style="margin:0; font-size:15px">
+            Tu maîtrises maintenant les <strong>concepts</strong> du théorème de Thalès :
+            reconnaître les configurations, identifier le sommet commun, repérer les droites parallèles,
+            associer les côtés homologues, et écrire la bonne égalité de proportionnalité.
+            La prochaine étape, ce sera les calculs !
+          </p>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="nextBtn" disabled>Voir le bilan →</button>
+      </div>
+    `
+  );
+}
+renderEx7.afterRender = () => {
+  const status = { 1: false, 2: false, 3: false, 4: false };
+  function checkDone() {
+    if (Object.values(status).every(Boolean)) {
+      document.getElementById('q7-final').style.display = '';
+      document.getElementById('nextBtn').disabled = false;
+    }
+  }
+  function setupQuestion(num, msgOk, msgKo, nextWrapId) {
+    const opts = document.querySelectorAll(`#q7-${num} .option`);
+    opts.forEach(opt => {
+      opt.addEventListener('click', () => {
+        if (status[num]) return;
+        opts.forEach(o => o.disabled = true);
+        if (opt.dataset.correct === 'true') {
+          opt.classList.add('correct');
+          showFeedback(`fb7-${num}`, 'success', msgOk);
+        } else {
+          opt.classList.add('wrong');
+          opts.forEach(o => { if (o.dataset.correct === 'true') o.classList.add('correct'); });
+          showFeedback(`fb7-${num}`, 'error', msgKo);
+        }
+        if (nextWrapId) document.getElementById(nextWrapId).style.display = '';
+        status[num] = true;
+        checkDone();
+      });
+    });
+  }
+  setupQuestion(1,
+    "✅ Oui ! Le petit triangle AMN est <em>à l'intérieur</em> du grand triangle ABC : c'est la configuration triangle.",
+    "❌ Regarde bien : le petit triangle est-il <em>à l'intérieur</em> du grand, ou <em>en face</em> ?",
+    'q7-2-wrap'
+  );
+  setupQuestion(2,
+    "✅ <strong>A</strong> est bien le sommet commun aux deux triangles.",
+    "❌ Le sommet commun est celui qui apparaît dans le nom des <em>deux</em> triangles : AMN et ABC.",
+    'q7-3-wrap'
+  );
+  setupQuestion(3,
+    "✅ Exactement ! [BC] est dans le grand triangle, son homologue [MN] est dans le petit. Ces deux segments sont parallèles.",
+    "❌ Cherche un côté du <em>petit</em> triangle (AMN) qui est <em>parallèle</em> à [BC].",
+    'q7-4-wrap'
+  );
+  setupQuestion(4,
+    "✅ Parfait ! Les côtés du petit triangle sont au numérateur, ceux du grand au dénominateur, et chaque fraction associe deux côtés homologues.",
+    "❌ Vérifie : numérateur = petit triangle, dénominateur = grand triangle, et chaque fraction = deux côtés homologues.",
+    null
+  );
+  attachNextHandler();
+};
+
+// ============================================================
+// Démarrage
+// ============================================================
+render();
+</script>
+
+</body>
+</html>
