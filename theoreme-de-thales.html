@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Théorème de Thalès — Version simple</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf8f4;
+    --text: #2c2a25;
+    --accent: #b8490e;
+    --accent-light: #fdf0e4;
+    --blue: #1a5276;
+    --blue-light: #ddeaf4;
+    --green: #1e6b45;
+    --green-light: #ddf3e6;
+    --purple: #5b2c8e;
+    --purple-light: #eedcf8;
+    --red: #a02020;
+    --border: #d6d2ca;
+    --card-bg: #fff;
+    --shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 18px;
+    line-height: 1.8;
+    padding: 1.5rem 1rem 4rem;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  header {
+    text-align: center;
+    padding: 2rem 0 1.5rem;
+    border-bottom: 4px solid var(--accent);
+    margin-bottom: 2.5rem;
+  }
+
+  header h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--accent);
+    margin-bottom: 0.2rem;
+  }
+
+  header .subtitle {
+    font-size: 1.05rem;
+    color: #999;
+  }
+
+  h2 {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--blue);
+    margin: 2.5rem 0 0.8rem;
+    padding: 0.4rem 0.8rem;
+    background: var(--blue-light);
+    border-radius: 6px;
+    display: inline-block;
+  }
+
+  h2 + p, h2 + div { margin-top: 0.8rem; }
+
+  h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 1.5rem 0 0.4rem;
+  }
+
+  p { margin-bottom: 0.9rem; }
+
+  /* --- Boxes --- */
+  .idea-box {
+    background: var(--accent-light);
+    border-left: 6px solid var(--accent);
+    border-radius: 0 10px 10px 0;
+    padding: 1.2rem 1.4rem;
+    margin: 1.2rem 0;
+    box-shadow: var(--shadow);
+  }
+  .idea-box .label {
+    font-weight: 800;
+    color: var(--accent);
+    font-size: 1rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .rule-box {
+    background: #fff8e1;
+    border: 3px solid #f0c040;
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin: 1.2rem 0;
+  }
+  .rule-box .label {
+    font-weight: 800;
+    color: #b08800;
+    font-size: 1rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .warning-box {
+    background: #fde8e8;
+    border-left: 6px solid var(--red);
+    border-radius: 0 10px 10px 0;
+    padding: 1.1rem 1.3rem;
+    margin: 1.2rem 0;
+  }
+  .warning-box .label {
+    font-weight: 800;
+    color: var(--red);
+    font-size: 1rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .exercise-box {
+    background: var(--green-light);
+    border: 3px solid var(--green);
+    border-radius: 10px;
+    padding: 1.3rem 1.4rem;
+    margin: 1.5rem 0;
+  }
+  .exercise-box .label {
+    font-weight: 800;
+    color: var(--green);
+    font-size: 1.05rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .problem-box {
+    background: var(--purple-light);
+    border: 3px solid var(--purple);
+    border-radius: 10px;
+    padding: 1.4rem 1.5rem;
+    margin: 2rem 0;
+  }
+  .problem-box .label {
+    font-weight: 800;
+    color: var(--purple);
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .tip {
+    background: #e8f5e9;
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    margin: 0.8rem 0;
+    font-size: 0.95rem;
+  }
+
+  /* --- Math --- */
+  .fraction {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    vertical-align: middle;
+    margin: 0 0.25em;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.92em;
+  }
+  .fraction .num, .fraction .den {
+    padding: 0 0.35em;
+    line-height: 1.3;
+  }
+  .fraction .num { border-bottom: 2.5px solid var(--text); }
+
+  .math {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9em;
+    color: var(--blue);
+    font-weight: 600;
+  }
+
+  .formula-block {
+    text-align: center;
+    padding: 0.8rem;
+    font-size: 1.1em;
+    margin: 0.8rem 0;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  .eq { font-size: 1.2em; margin: 0 0.15em; vertical-align: middle; }
+
+  .highlight {
+    background: #fef3cd;
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+    font-weight: 700;
+  }
+
+  /* --- Figures --- */
+  figure { text-align: center; margin: 1.2rem 0; }
+  figure svg { max-width: 100%; height: auto; }
+  figcaption {
+    font-size: 0.82rem;
+    color: #aaa;
+    margin-top: 0.3rem;
+    font-style: italic;
+  }
+
+  /* --- Corrections --- */
+  details { margin-top: 0.7rem; }
+  summary {
+    font-weight: 700;
+    color: var(--green);
+    cursor: pointer;
+    padding: 0.3rem 0;
+    font-size: 0.95rem;
+  }
+  summary:hover { text-decoration: underline; }
+  details .solution {
+    background: #fff;
+    border: 1px solid #c5dfc5;
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    margin-top: 0.4rem;
+    font-size: 0.95em;
+  }
+  .step { margin-bottom: 0.6rem; }
+  .step-label {
+    font-weight: 800;
+    color: var(--accent);
+    font-size: 0.9rem;
+  }
+
+  /* --- TOC --- */
+  .toc {
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 1.2rem 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow);
+  }
+  .toc .toc-title { font-weight: 800; font-size: 1rem; margin-bottom: 0.5rem; }
+  .toc ol { padding-left: 1.3rem; font-size: 0.95rem; }
+  .toc li { margin-bottom: 0.25rem; }
+  .toc a { color: var(--blue); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+
+  @media (max-width: 600px) {
+    body { font-size: 17px; padding: 1rem 0.7rem 3rem; }
+    header h1 { font-size: 1.6rem; }
+    h2 { font-size: 1.15rem; }
+    .formula-block { font-size: 1em; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Le Théorème de Thalès</h1>
+  <div class="subtitle">Expliqué simplement, pas à pas</div>
+</header>
+
+<nav class="toc">
+  <div class="toc-title">Ce qu'on va voir :</div>
+  <ol>
+    <li><a href="#reconnaitre">Reconnaître la « forme » de Thalès</a></li>
+    <li><a href="#direct">Utiliser Thalès pour trouver une longueur</a></li>
+    <li><a href="#reciproque">Prouver que deux droites sont parallèles</a></li>
+    <li><a href="#contraposee">Prouver que deux droites ne sont PAS parallèles</a></li>
+    <li><a href="#pieges">Les pièges : quand ça marche et quand ça ne marche pas</a></li>
+    <li><a href="#methode">La méthode à suivre à chaque fois</a></li>
+    <li><a href="#probleme">Problème final</a></li>
+  </ol>
+</nav>
+
+
+<!-- ============================================================ -->
+<h2 id="reconnaitre">1. Reconnaître la « forme » de Thalès</h2>
+
+<p>
+Avant d'utiliser le théorème, il faut <strong>reconnaître le dessin</strong>. C'est toujours la même forme. Si tu ne la vois pas, tu ne peux pas utiliser Thalès.
+</p>
+
+<div class="idea-box">
+  <div class="label">🔍 Ce qu'il faut voir dans la figure :</div>
+  <p><strong>1.</strong> Il y a <strong>deux droites qui se croisent en un point</strong>. Ce point, on l'appelle le <strong>sommet</strong>. C'est le point le plus important.</p>
+  <p><strong>2.</strong> Il y a <strong>deux droites parallèles</strong> qui traversent les deux premières.</p>
+  <p style="margin-bottom:0">Ça fait comme <strong>un petit triangle à l'intérieur d'un grand triangle</strong>. Les deux triangles ont le même sommet.</p>
+</div>
+
+<p>Cette forme peut se présenter de deux façons :</p>
+
+<figure>
+  <svg viewBox="0 0 600 300" width="600" height="300">
+    <!-- Forme triangle -->
+    <g transform="translate(10, 0)">
+      <text x="140" y="24" font-family="Nunito" font-size="14" font-weight="800" fill="#1a5276" text-anchor="middle">Version « triangle »</text>
+      <line x1="140" y1="50" x2="40" y2="270" stroke="#2c2a25" stroke-width="1.8"/>
+      <line x1="140" y1="50" x2="260" y2="270" stroke="#2c2a25" stroke-width="1.8"/>
+      <line x1="76" y1="180" x2="216" y2="180" stroke="#b8490e" stroke-width="2.5" stroke-dasharray="6,4"/>
+      <line x1="40" y1="270" x2="260" y2="270" stroke="#b8490e" stroke-width="2.5"/>
+      <circle cx="140" cy="50" r="6" fill="#1a5276"/>
+      <circle cx="76" cy="180" r="5" fill="#b8490e"/>
+      <circle cx="216" cy="180" r="5" fill="#b8490e"/>
+      <circle cx="40" cy="270" r="5" fill="#1a5276"/>
+      <circle cx="260" cy="270" r="5" fill="#1a5276"/>
+      <text x="140" y="42" font-family="JetBrains Mono" font-size="17" font-weight="700" fill="#1a5276" text-anchor="middle">A</text>
+      <text x="58" y="178" font-family="JetBrains Mono" font-size="16" font-weight="600" fill="#b8490e" text-anchor="end">M</text>
+      <text x="230" y="178" font-family="JetBrains Mono" font-size="16" font-weight="600" fill="#b8490e">N</text>
+      <text x="24" y="285" font-family="JetBrains Mono" font-size="16" font-weight="600" fill="#1a5276">B</text>
+      <text x="265" y="285" font-family="JetBrains Mono" font-size="16" font-weight="600" fill="#1a5276">C</text>
+      <text x="140" y="225" font-family="Nunito" font-size="13" fill="#b8490e" font-weight="700" text-anchor="middle">// parallèles //</text>
+      <text x="148" y="62" font-family="Nunito" font-size="11" fill="#1a5276" font-weight="700">← sommet</text>
+    </g>
+    <!-- Forme sablier -->
+    <g transform="translate(310, 0)">
+      <text x="140" y="24" font-family="Nunito" font-size="14" font-weight="800" fill="#1a5276" text-anchor="middle">Version « sablier »</text>
+      <line x1="60" y1="70" x2="230" y2="270" stroke="#2c2a25" stroke-width="1.8"/>
+      <line x1="230" y1="70" x2="60" y2="270" stroke="#2c2a25" stroke-width="1.8"/>
+      <circle cx="145" cy="170" r="6" fill="#1a5276"/>
+      <circle cx="97" cy="113" r="5" fill="#b8490e"/>
+      <circle cx="196" cy="113" r="5" fill="#b8490e"/>
+      <circle cx="200" cy="235" r="5" fill="#1a5276"/>
+      <circle cx="93" cy="235" r="5" fill="#1a5276"/>
+      <line x1="75" y1="113" x2="218" y2="113" stroke="#b8490e" stroke-width="2.5" stroke-dasharray="6,4"/>
+      <line x1="72" y1="235" x2="222" y2="235" stroke="#b8490e" stroke-width="2.5"/>
+      <text x="145" y="163" font-family="JetBrains Mono" font-size="17" font-weight="700" fill="#1a5276" text-anchor="middle">A</text>
+      <text x="80" y="108" font-family="JetBrains Mono" font-size="16" font-weight="600" fill="#b8490e" text-anchor="end">M</text>
+      <text x="208" y="108" font-family="JetBrains Mono" font-size="16" font-weight="600" fill="#b8490e">N</text>
+      <text x="76" y="252" font-family="JetBrains Mono" font-size="16" font-weight="600" fill="#1a5276" text-anchor="end">B</text>
+      <text x="210" y="252" font-family="JetBrains Mono" font-size="16" font-weight="600" fill="#1a5276">C</text>
+      <text x="140" y="178" font-family="Nunito" font-size="11" fill="#1a5276" font-weight="700" text-anchor="middle">← sommet</text>
+      <text x="140" y="290" font-family="Nunito" font-size="13" fill="#b8490e" font-weight="700" text-anchor="middle">// parallèles //</text>
+    </g>
+  </svg>
+  <figcaption>Les deux formes possibles. Le sommet A est toujours là où les droites se croisent.</figcaption>
+</figure>
+
+<div class="tip">
+  💡 <strong>Astuce :</strong> Cherche toujours <strong>le point où ça se croise</strong> : c'est ton sommet. Puis cherche les <strong>deux traits parallèles</strong> (sur la figure, c'est souvent montré avec des petites flèches >  >).
+</div>
+
+
+<!-- ============================================================ -->
+<h2 id="direct">2. Utiliser Thalès pour trouver une longueur</h2>
+
+<h3>Ça sert à quoi exactement ?</h3>
+<p>
+Tu connais certaines longueurs sur ta figure, mais <strong>il t'en manque une</strong>. Le théorème de Thalès te permet de <strong>la calculer</strong>.
+</p>
+
+<p>Mais attention : ça ne marche <strong>que si on sait que les deux droites sont parallèles</strong>. C'est la condition obligatoire.</p>
+
+<div class="idea-box">
+  <div class="label">🖨️ Pour bien comprendre — la photocopieuse :</div>
+  <p>Imagine que tu mets un triangle dans une photocopieuse et que tu le <strong>réduis à 50 %</strong>.</p>
+  <p>Un côté de 10 cm devient 5 cm. Un côté de 8 cm devient 4 cm. <strong>Tout est divisé par le même nombre.</strong></p>
+  <p style="margin-bottom:0">C'est exactement ça, Thalès : quand les droites sont parallèles, le petit triangle est une <strong>photocopie réduite</strong> du grand. Tous les côtés sont réduits pareil.</p>
+</div>
+
+<div class="rule-box">
+  <div class="label">📐 Le théorème de Thalès</div>
+  <p>Si <span class="math">(MN)</span> est <strong>parallèle</strong> à <span class="math">(BC)</span>, alors ces trois fractions sont <strong>égales</strong> :</p>
+  <div class="formula-block">
+    <span class="fraction"><span class="num">AM</span><span class="den">AB</span></span>
+    <span class="eq">=</span>
+    <span class="fraction"><span class="num">AN</span><span class="den">AC</span></span>
+    <span class="eq">=</span>
+    <span class="fraction"><span class="num">MN</span><span class="den">BC</span></span>
+  </div>
+  <p><strong>Comment lire :</strong> en haut de chaque fraction → une mesure du <strong>petit</strong> triangle. En bas → la mesure du <strong>grand</strong> triangle (le même côté).</p>
+  <p style="margin-bottom:0">Quand tu connais assez de nombres, tu trouves celui qui manque avec un <strong>produit en croix</strong>.</p>
+</div>
+
+<div class="exercise-box">
+  <div class="label">✏️ Exercice 1 — Trouver une longueur</div>
+  <figure>
+    <svg viewBox="0 0 400 260" width="400" height="260">
+      <line x1="200" y1="30" x2="80" y2="240" stroke="#2c2a25" stroke-width="1.5"/>
+      <line x1="200" y1="30" x2="340" y2="240" stroke="#2c2a25" stroke-width="1.5"/>
+      <line x1="128" y1="150" x2="284" y2="150" stroke="#b8490e" stroke-width="2.2" stroke-dasharray="6,4"/>
+      <line x1="80" y1="240" x2="340" y2="240" stroke="#b8490e" stroke-width="2.2"/>
+      <circle cx="200" cy="30" r="5" fill="#1a5276"/>
+      <circle cx="128" cy="150" r="4" fill="#b8490e"/>
+      <circle cx="284" cy="150" r="4" fill="#b8490e"/>
+      <circle cx="80" cy="240" r="4" fill="#1a5276"/>
+      <circle cx="340" cy="240" r="4" fill="#1a5276"/>
+      <text x="200" y="22" font-family="JetBrains Mono" font-size="16" font-weight="700" fill="#1a5276" text-anchor="middle">A</text>
+      <text x="112" y="150" font-family="JetBrains Mono" font-size="15" fill="#b8490e" text-anchor="end">M</text>
+      <text x="296" y="150" font-family="JetBrains Mono" font-size="15" fill="#b8490e">N</text>
+      <text x="64" y="250" font-family="JetBrains Mono" font-size="15" fill="#1a5276">B</text>
+      <text x="346" y="250" font-family="JetBrains Mono" font-size="15" fill="#1a5276">C</text>
+      <text x="148" y="82" font-family="Nunito" font-size="14" fill="#1e6b45" font-weight="700" transform="rotate(-45, 148, 82)">3 cm</text>
+      <text x="88" y="208" font-family="Nunito" font-size="14" fill="#1e6b45" font-weight="700" transform="rotate(-45, 88, 208)">2 cm</text>
+      <text x="206" y="170" font-family="Nunito" font-size="14" fill="#b8490e" font-weight="700" text-anchor="middle">MN = ?</text>
+      <text x="210" y="256" font-family="Nunito" font-size="14" fill="#1e6b45" font-weight="700" text-anchor="middle">BC = 10 cm</text>
+    </svg>
+  </figure>
+  <p>On sait que <span class="math">(MN) // (BC)</span> (elles sont parallèles).</p>
+  <p>On donne : <span class="math">AM = 3 cm</span>, <span class="math">MB = 2 cm</span>, <span class="math">BC = 10 cm</span>.</p>
+  <p><strong>Calcule MN.</strong></p>
+
+  <details>
+    <summary>👀 Voir la correction</summary>
+    <div class="solution">
+      <p class="step"><span class="step-label">Étape 1 :</span> Je reconnais la figure. Le sommet c'est <span class="math">A</span>. Les parallèles sont <span class="math">(MN)</span> et <span class="math">(BC)</span>. ✅</p>
+
+      <p class="step"><span class="step-label">Étape 2 :</span> Je calcule <span class="math">AB</span>. C'est <span class="math">AM + MB = 3 + 2 = 5 cm</span>.</p>
+
+      <p class="step"><span class="step-label">Étape 3 :</span> J'écris les fractions de Thalès :</p>
+      <div class="formula-block">
+        <span class="fraction"><span class="num">AM</span><span class="den">AB</span></span>
+        <span class="eq">=</span>
+        <span class="fraction"><span class="num">MN</span><span class="den">BC</span></span>
+      </div>
+
+      <p class="step"><span class="step-label">Étape 4 :</span> Je remplace par les nombres :</p>
+      <div class="formula-block">
+        <span class="fraction"><span class="num">3</span><span class="den">5</span></span>
+        <span class="eq">=</span>
+        <span class="fraction"><span class="num">MN</span><span class="den">10</span></span>
+      </div>
+
+      <p class="step"><span class="step-label">Étape 5 :</span> Produit en croix :</p>
+      <p><span class="math">MN = (3 × 10) ÷ 5 = 30 ÷ 5 = <span class="highlight">6 cm</span></span></p>
+
+      <p class="step"><span class="step-label">Conclusion :</span> D'après le théorème de Thalès, <span class="math">MN = 6 cm</span>. ✅</p>
+    </div>
+  </details>
+</div>
+
+
+<!-- ============================================================ -->
+<h2 id="reciproque">3. Prouver que deux droites sont parallèles</h2>
+
+<h3>Ça sert à quoi ?</h3>
+<p>
+Parfois, dans l'exercice, on ne te dit <strong>pas</strong> que les droites sont parallèles. C'est à <strong>toi</strong> de le prouver.
+</p>
+
+<p>Pour ça, on utilise le théorème <strong>« à l'envers »</strong>. Ça s'appelle la <strong>réciproque</strong>.</p>
+
+<p>Le raisonnement est simple : <strong>si les fractions sont égales, alors les droites sont parallèles.</strong></p>
+
+<div class="rule-box">
+  <div class="label">📐 Réciproque du théorème de Thalès</div>
+  <p>Si les points sont bien placés <strong>dans le même ordre</strong>, et si :</p>
+  <div class="formula-block">
+    <span class="fraction"><span class="num">AM</span><span class="den">AB</span></span>
+    <span class="eq">=</span>
+    <span class="fraction"><span class="num">AN</span><span class="den">AC</span></span>
+  </div>
+  <p style="margin-bottom:0">alors on peut dire que <strong><span class="math">(MN)</span> est parallèle à <span class="math">(BC)</span></strong>.</p>
+</div>
+
+<div class="warning-box">
+  <div class="label">⚠️ Le piège que tout le monde oublie !</div>
+  <p>Pour avoir le droit d'utiliser la réciproque, il faut <strong>vérifier que les points sont dans le même ordre</strong> sur chaque droite.</p>
+  <p>Par exemple : en partant de A, on tombe d'abord sur M puis sur B. Sur l'autre droite, en partant de A, on doit aussi tomber d'abord sur N puis sur C.</p>
+  <p style="margin-bottom:0">Si ce n'est pas le cas, <strong>tu n'as pas le droit de conclure</strong>. Même si les fractions sont égales !</p>
+</div>
+
+<div class="exercise-box">
+  <div class="label">✏️ Exercice 2 — Est-ce que c'est parallèle ?</div>
+  <p>Dans un triangle <span class="math">RST</span>, le point <span class="math">E</span> est sur le côté <span class="math">[RS]</span> et le point <span class="math">F</span> est sur le côté <span class="math">[RT]</span>.</p>
+  <p>On donne : <span class="math">RE = 4</span>, <span class="math">RS = 10</span>, <span class="math">RF = 6</span>, <span class="math">RT = 15</span>.</p>
+  <p><strong>Est-ce que <span class="math">(EF)</span> est parallèle à <span class="math">(ST)</span> ?</strong></p>
+
+  <details>
+    <summary>👀 Voir la correction</summary>
+    <div class="solution">
+      <p class="step"><span class="step-label">Étape 1 :</span> Le sommet c'est <span class="math">R</span>. On a <span class="math">E</span> sur <span class="math">[RS]</span> et <span class="math">F</span> sur <span class="math">[RT]</span>. En partant de R : on tombe d'abord sur E puis sur S. Et sur l'autre côté : d'abord sur F puis sur T. <strong>Même ordre</strong> ✅</p>
+
+      <p class="step"><span class="step-label">Étape 2 :</span> Je calcule les fractions :</p>
+      <div class="formula-block">
+        <span class="fraction"><span class="num">RE</span><span class="den">RS</span></span>
+        <span class="eq">=</span>
+        <span class="fraction"><span class="num">4</span><span class="den">10</span></span>
+        <span class="eq">=</span> 0,4
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <span class="fraction"><span class="num">RF</span><span class="den">RT</span></span>
+        <span class="eq">=</span>
+        <span class="fraction"><span class="num">6</span><span class="den">15</span></span>
+        <span class="eq">=</span> 0,4
+      </div>
+
+      <p class="step"><span class="step-label">Étape 3 :</span> Les deux fractions donnent <strong>le même résultat</strong> : 0,4 = 0,4 ✅</p>
+
+      <p class="step"><span class="step-label">Conclusion :</span> Les points sont dans le même ordre et les fractions sont égales. Donc d'après la <strong>réciproque du théorème de Thalès</strong>, <span class="math">(EF)</span> est parallèle à <span class="math">(ST)</span>. ✅</p>
+    </div>
+  </details>
+</div>
+
+
+<!-- ============================================================ -->
+<h2 id="contraposee">4. Prouver que deux droites ne sont PAS parallèles</h2>
+
+<h3>Ça sert à quoi ?</h3>
+<p>
+C'est le contraire de ce qu'on vient de faire. Si tu calcules les fractions et qu'elles <strong>ne donnent pas le même résultat</strong>, alors tu es sûr que <strong>les droites ne sont pas parallèles</strong>.
+</p>
+
+<p>Ça s'appelle la <strong>contraposée</strong>. Le mot fait peur, mais c'est l'idée la plus simple du chapitre :</p>
+
+<div class="rule-box">
+  <div class="label">📐 Contraposée du théorème de Thalès</div>
+  <p>Si les fractions ne sont <strong>pas</strong> égales :</p>
+  <div class="formula-block">
+    <span class="fraction"><span class="num">AM</span><span class="den">AB</span></span>
+    <span class="eq">≠</span>
+    <span class="fraction"><span class="num">AN</span><span class="den">AC</span></span>
+  </div>
+  <p style="margin-bottom:0">alors <strong><span class="math">(MN)</span> n'est pas parallèle à <span class="math">(BC)</span></strong>.</p>
+</div>
+
+<div class="tip">
+  💡 <strong>Pour résumer les deux d'un coup :</strong><br>
+  — Fractions <strong>égales</strong> + même ordre des points → c'est <strong>parallèle</strong> ✅<br>
+  — Fractions <strong>pas égales</strong> → c'est <strong>pas parallèle</strong> ❌
+</div>
+
+<div class="exercise-box">
+  <div class="label">✏️ Exercice 3 — Parallèles ou pas ?</div>
+  <p>Dans un triangle <span class="math">ABC</span>, on place <span class="math">M</span> sur <span class="math">[AB]</span> et <span class="math">N</span> sur <span class="math">[AC]</span>.</p>
+  <p>On donne : <span class="math">AM = 3</span>, <span class="math">AB = 9</span>, <span class="math">AN = 5</span>, <span class="math">AC = 12</span>.</p>
+  <p><strong>Est-ce que <span class="math">(MN)</span> est parallèle à <span class="math">(BC)</span> ?</strong></p>
+
+  <details>
+    <summary>👀 Voir la correction</summary>
+    <div class="solution">
+      <p class="step"><span class="step-label">Étape 1 :</span> Je calcule les fractions :</p>
+      <div class="formula-block">
+        <span class="fraction"><span class="num">AM</span><span class="den">AB</span></span>
+        <span class="eq">=</span>
+        <span class="fraction"><span class="num">3</span><span class="den">9</span></span>
+        <span class="eq">=</span> 0,333...
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <span class="fraction"><span class="num">AN</span><span class="den">AC</span></span>
+        <span class="eq">=</span>
+        <span class="fraction"><span class="num">5</span><span class="den">12</span></span>
+        <span class="eq">=</span> 0,416...
+      </div>
+
+      <p class="step"><span class="step-label">Étape 2 :</span> 0,333 et 0,416 : ce n'est <strong>pas pareil</strong>.</p>
+
+      <p class="step"><span class="step-label">Conclusion :</span> D'après la <strong>contraposée du théorème de Thalès</strong>, <span class="math">(MN)</span> <strong>n'est pas</strong> parallèle à <span class="math">(BC)</span>. ❌</p>
+    </div>
+  </details>
+</div>
+
+
+<!-- ============================================================ -->
+<h2 id="pieges">5. Quand ça marche et quand ça ne marche pas</h2>
+
+<p>On ne peut pas utiliser Thalès dans n'importe quelle situation. Voici comment savoir :</p>
+
+<div class="idea-box">
+  <div class="label">✅ Tu PEUX utiliser Thalès si :</div>
+  <p><strong>1.</strong> Tu vois <strong>deux droites qui se croisent en un seul point</strong> (ton sommet).</p>
+  <p><strong>2.</strong> Elles sont traversées par <strong>deux droites parallèles</strong> (ou bien on te demande de vérifier si elles le sont).</p>
+  <p style="margin-bottom:0"><strong>3.</strong> Tu as <strong>assez de mesures</strong> pour écrire les fractions (au moins 3 longueurs pour en trouver une 4ᵉ).</p>
+</div>
+
+<div class="warning-box">
+  <div class="label">❌ Tu NE PEUX PAS utiliser Thalès si :</div>
+  <p><strong>1.</strong> Les droites <strong>ne se croisent pas</strong> en un point. Par exemple dans un rectangle, les côtés ne se croisent pas → pas de sommet → pas de Thalès.</p>
+  <p><strong>2.</strong> Personne ne dit que c'est <strong>parallèle</strong> et on ne te demande pas de le vérifier. Tu ne peux pas inventer cette info !</p>
+  <p style="margin-bottom:0"><strong>3.</strong> Les points ne sont <strong>pas sur les bonnes droites</strong>. Par exemple, M doit être sur la droite (AB), pas ailleurs.</p>
+</div>
+
+<div class="exercise-box">
+  <div class="label">✏️ Exercice 4 — Est-ce que Thalès marche ici ?</div>
+  <p>Pour chaque cas, dis si on peut utiliser Thalès ou pas. Si oui, dis <strong>lequel</strong> : le direct, la réciproque, ou la contraposée.</p>
+
+  <p><strong>Cas A :</strong> Dans un triangle <span class="math">DEF</span>, on sait que <span class="math">(GH)</span> est parallèle à <span class="math">(EF)</span>. Le point G est sur le côté <span class="math">[DE]</span> et H sur le côté <span class="math">[DF]</span>. On connaît <span class="math">DG</span>, <span class="math">DE</span> et <span class="math">EF</span>, et on cherche <span class="math">GH</span>.</p>
+
+  <p><strong>Cas B :</strong> On a un rectangle <span class="math">ABCD</span>. Les côtés opposés sont parallèles, mais <strong>aucune droite ne se croise</strong>.</p>
+
+  <p><strong>Cas C :</strong> Deux droites se croisent en un point <span class="math">O</span>. On connaît <span class="math">OA = 4</span>, <span class="math">OB = 6</span>, <span class="math">OC = 3</span> et <span class="math">OD = 4,5</span>. On veut savoir si <span class="math">(AC)</span> est parallèle à <span class="math">(BD)</span>.</p>
+
+  <details>
+    <summary>👀 Voir la correction</summary>
+    <div class="solution">
+      <p class="step"><strong>Cas A :</strong> ✅ <strong>Oui — théorème direct.</strong> On a un sommet (D), on sait que c'est parallèle, et on cherche une longueur. C'est la situation parfaite pour Thalès.</p>
+
+      <p class="step"><strong>Cas B :</strong> ❌ <strong>Non.</strong> Dans un rectangle, les côtés ne se croisent jamais. Il n'y a pas de sommet. Donc pas de figure de Thalès.</p>
+
+      <p class="step"><strong>Cas C :</strong> ✅ <strong>Oui — réciproque.</strong> On a un sommet (O), et on veut savoir si c'est parallèle. On calcule les fractions :</p>
+      <div class="formula-block">
+        <span class="fraction"><span class="num">OA</span><span class="den">OB</span></span>
+        <span class="eq">=</span>
+        <span class="fraction"><span class="num">4</span><span class="den">6</span></span>
+        <span class="eq">=</span> 0,666...
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <span class="fraction"><span class="num">OC</span><span class="den">OD</span></span>
+        <span class="eq">=</span>
+        <span class="fraction"><span class="num">3</span><span class="den">4,5</span></span>
+        <span class="eq">=</span> 0,666...
+      </div>
+      <p>C'est <strong>pareil</strong> ! Donc d'après la <strong>réciproque</strong>, <span class="math">(AC)</span> est parallèle à <span class="math">(BD)</span>. ✅</p>
+    </div>
+  </details>
+</div>
+
+
+<!-- ============================================================ -->
+<h2 id="methode">6. La méthode — à suivre à chaque exercice</h2>
+
+<p>À chaque exercice sur Thalès, suis ces étapes dans l'ordre. C'est comme une recette de cuisine :</p>
+
+<div class="rule-box">
+  <div class="label">📋 Ma recette Thalès</div>
+  <p><strong>1.</strong> Je cherche le <strong>sommet</strong> : c'est le point où les deux droites se croisent.</p>
+  <p><strong>2.</strong> Je me demande : <em>qu'est-ce qu'on veut que je fasse ?</em></p>
+  <p style="margin-left:1.2rem">→ Trouver une <strong>longueur</strong> ? → j'utilise le <strong>théorème direct</strong></p>
+  <p style="margin-left:1.2rem">→ Savoir si c'est <strong>parallèle</strong> ou pas ? → j'utilise la <strong>réciproque</strong> ou la <strong>contraposée</strong></p>
+  <p><strong>3.</strong> J'écris les fractions. Attention : je commence toujours par le <strong>sommet</strong> dans les noms de segments.</p>
+  <p><strong>4.</strong> Je remplace les lettres par les nombres.</p>
+  <p><strong>5.</strong> Je calcule (produit en croix ou je compare les résultats des fractions).</p>
+  <p style="margin-bottom:0"><strong>6.</strong> J'écris ma <strong>conclusion</strong> en disant le nom du théorème. C'est <strong>obligatoire</strong> pour avoir les points !</p>
+</div>
+
+<div class="warning-box">
+  <div class="label">🚨 L'erreur n°1</div>
+  <p style="margin-bottom:0">Oublier de dire <strong>quel théorème</strong> on utilise dans la conclusion. Pense toujours à écrire : « D'après le théorème de Thalès… » ou « D'après la réciproque du théorème de Thalès… ». Si tu ne le fais pas, tu perds des points pour rien !</p>
+</div>
+
+
+<!-- ============================================================ -->
+<h2 id="probleme">7. Problème final</h2>
+
+<div class="problem-box">
+  <div class="label">🧩 Le poteau, le bâton et la rivière</div>
+
+  <figure>
+    <svg viewBox="0 0 520 280" width="520" height="280">
+      <line x1="20" y1="230" x2="500" y2="230" stroke="#ccc" stroke-width="1"/>
+      <rect x="210" y="222" width="80" height="16" fill="#d4e6f1" rx="3"/>
+      <text x="250" y="234" font-family="Nunito" font-size="11" fill="#1a5276" text-anchor="middle" font-weight="700">rivière</text>
+      <!-- Poteau -->
+      <line x1="120" y1="230" x2="120" y2="110" stroke="#5b2c8e" stroke-width="5" stroke-linecap="round"/>
+      <text x="120" y="248" font-family="Nunito" font-size="13" fill="#5b2c8e" text-anchor="middle" font-weight="700">P</text>
+      <text x="100" y="175" font-family="Nunito" font-size="14" fill="#5b2c8e" font-weight="700">6 m</text>
+      <!-- Bâton -->
+      <line x1="340" y1="230" x2="340" y2="190" stroke="#1e6b45" stroke-width="4" stroke-linecap="round"/>
+      <text x="340" y="248" font-family="Nunito" font-size="13" fill="#1e6b45" text-anchor="middle" font-weight="700">B</text>
+      <text x="355" y="215" font-family="Nunito" font-size="14" fill="#1e6b45" font-weight="700">2 m</text>
+      <!-- Rayons -->
+      <line x1="120" y1="110" x2="460" y2="230" stroke="#f0c040" stroke-width="2" stroke-dasharray="8,4"/>
+      <line x1="340" y1="190" x2="460" y2="230" stroke="#f0c040" stroke-width="2" stroke-dasharray="8,4"/>
+      <!-- Point S -->
+      <circle cx="460" cy="230" r="5" fill="#b8490e"/>
+      <text x="472" y="228" font-family="Nunito" font-size="14" fill="#b8490e" font-weight="700">S</text>
+      <!-- Distances -->
+      <text x="400" y="268" font-family="Nunito" font-size="13" fill="#b8490e" font-weight="700" text-anchor="middle">BS = 5 m</text>
+      <text x="290" y="268" font-family="Nunito" font-size="13" fill="#1a5276" font-weight="700" text-anchor="middle">PS = 15 m</text>
+      <text x="80" y="80" font-size="30">☀️</text>
+    </svg>
+  </figure>
+
+  <p>Tom veut mesurer la largeur d'une rivière <strong>sans la traverser</strong>.</p>
+
+  <p>Il a une idée : il utilise le soleil ! Il plante un <strong>poteau de 6 m</strong> au point P (d'un côté de la rivière) et un <strong>petit bâton de 2 m</strong> au point B (de l'autre côté).</p>
+
+  <p>Le soleil crée des ombres. Les deux ombres se rejoignent au même point <span class="math">S</span>.</p>
+
+  <p>Tom mesure au sol : du pied du poteau jusqu'à S, il y a <span class="math">PS = 15 m</span>. Du pied du bâton jusqu'à S, il y a <span class="math">BS = 5 m</span>.</p>
+
+  <p>Le poteau P est à <span class="math">3 m</span> du bord de la rivière (de son côté). Le bâton B est à <span class="math">1 m</span> du bord de la rivière (de l'autre côté).</p>
+
+  <p><strong>Question 1 :</strong> Pourquoi c'est une figure de Thalès ? C'est quoi le sommet ? C'est quoi les parallèles ?</p>
+
+  <p><strong>Question 2 :</strong> Vérifie que les mesures « collent bien » (que les fractions sont égales).</p>
+
+  <p><strong>Question 3 :</strong> Calcule la largeur de la rivière.</p>
+
+  <details>
+    <summary>👀 Voir la correction complète</summary>
+    <div class="solution">
+      <h3>Question 1 — Pourquoi c'est du Thalès ?</h3>
+      <p class="step">Le poteau et le bâton sont tous les deux <strong>plantés bien droit</strong> (verticaux). Deux trucs verticaux, c'est toujours <strong>parallèle</strong>. Ce sont nos deux droites parallèles.</p>
+      <p class="step">Les rayons du soleil touchent le haut du poteau et le haut du bâton. Les deux ombres se rejoignent au point <span class="math">S</span>. Ce point S, c'est le <strong>sommet</strong>.</p>
+      <p class="step">On a bien la bonne forme : deux droites (les rayons) qui se croisent en S, et deux parallèles (le poteau et le bâton). ✅</p>
+
+      <h3>Question 2 — On vérifie que ça colle</h3>
+      <p class="step">Si c'est vraiment parallèle, les fractions de Thalès doivent être égales. On vérifie :</p>
+      <div class="formula-block">
+        <span class="fraction"><span class="num">BS</span><span class="den">PS</span></span>
+        <span class="eq">=</span>
+        <span class="fraction"><span class="num">5</span><span class="den">15</span></span>
+        <span class="eq">=</span>
+        <span class="fraction"><span class="num">1</span><span class="den">3</span></span>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <span class="fraction"><span class="num">hauteur bâton</span><span class="den">hauteur poteau</span></span>
+        <span class="eq">=</span>
+        <span class="fraction"><span class="num">2</span><span class="den">6</span></span>
+        <span class="eq">=</span>
+        <span class="fraction"><span class="num">1</span><span class="den">3</span></span>
+      </div>
+      <p class="step">Les deux fractions donnent 1/3. C'est <strong>pareil</strong>.</p>
+      <p class="step">D'après la <strong>réciproque du théorème de Thalès</strong>, le poteau et le bâton sont bien parallèles. ✅ (C'est logique, ils sont plantés droit tous les deux !)</p>
+
+      <h3>Question 3 — La largeur de la rivière</h3>
+      <p class="step"><span class="step-label">Étape 1 :</span> Les pieds du poteau P, du bâton B et le point S sont <strong>alignés</strong> (ils sont tous sur la ligne des ombres au sol).</p>
+      <p class="step">La distance entre P et B au sol, c'est :</p>
+      <div class="formula-block">
+        <span class="math">PB = PS − BS = 15 − 5 = 10 m</span>
+      </div>
+
+      <p class="step"><span class="step-label">Étape 2 :</span> Entre le poteau P et le bâton B, qu'est-ce qu'il y a ? Je fais le chemin :</p>
+      <p style="margin-left:1rem">→ D'abord <strong>3 m</strong> du poteau jusqu'au bord de la rivière</p>
+      <p style="margin-left:1rem">→ Puis la <strong>rivière</strong> (sa largeur, c'est ce qu'on cherche : on l'appelle <span class="math">L</span>)</p>
+      <p style="margin-left:1rem">→ Puis <strong>1 m</strong> du bord de la rivière jusqu'au bâton</p>
+
+      <p class="step"><span class="step-label">Étape 3 :</span> Si on additionne tout ça, on doit retrouver 10 m :</p>
+      <div class="formula-block">
+        <span class="math">3 + L + 1 = 10</span>
+      </div>
+      <div class="formula-block">
+        <span class="math">L + 4 = 10</span>
+      </div>
+      <div class="formula-block">
+        <span class="math highlight">L = 6 m</span>
+      </div>
+
+      <p class="step"><span class="step-label">Réponse :</span> La rivière fait <strong>6 mètres</strong> de large. 🎉</p>
+
+      <h3 style="margin-top:1.2rem">Ce qu'on a utilisé dans ce problème :</h3>
+      <p class="step">✅ <strong>Reconnaître</strong> la figure de Thalès (question 1)</p>
+      <p class="step">✅ La <strong>réciproque</strong> pour vérifier que c'est parallèle (question 2)</p>
+      <p class="step">✅ Le <strong>théorème direct</strong> pour calculer une distance (question 3)</p>
+    </div>
+  </details>
+</div>
+
+<div style="text-align:center; margin-top:2.5rem; padding:1.5rem; background:var(--green-light); border-radius:12px;">
+  <p style="font-size:1.2rem; font-weight:800; color:var(--green); margin-bottom:0.3rem;">Bravo, tu as tout lu ! 🎉</p>
+  <p style="margin-bottom:0; color:var(--green);">Retiens bien la « recette » de la partie 6. Essaye de refaire les exercices tout seul sur une feuille. Si tu y arrives sans regarder la correction, c'est gagné !</p>
+</div>
+
+</body>
+</html>
